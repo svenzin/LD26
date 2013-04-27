@@ -8,7 +8,7 @@ import nme.events.MouseEvent;
  */
 interface Phase
 {
-	function Go() : Void;
+	function Go(player : Player) : Void;
 	function IsValidFor(player : Player, cell : Cell) : Bool;
 	function ActionFor(player : Player, cell : Cell) : Void;
 }
@@ -16,7 +16,7 @@ interface Phase
 class PhaseNone implements Phase
 {
 	public function new() {}
-	public function Go() { Main.MainConsole.Log("GoNone"); }
+	public function Go(player : Player) { Main.MainConsole.Log("GoNone"); }
 	public function IsValidFor(player : Player, cell : Cell) : Bool { return true; }
 	public function ActionFor(player : Player, cell : Cell) { Main.MainConsole.Log("ActionForNone"); }
 }
@@ -25,7 +25,11 @@ class PhaseExplore implements Phase
 {
 	public function new() {}
 
-	public function Go() { Main.MainConsole.Log("GoExplore"); }
+	public function Go(player : Player)
+	{
+		Main.MainConsole.Log("GoExplore");
+		player.Energy += 1;
+	}
 	
 	public function IsValidFor(player : Player, cell : Cell) : Bool
 	{
@@ -51,11 +55,17 @@ class PhaseSettle implements Phase
 {
 	public function new() {}
 
-	public function Go() { Main.MainConsole.Log("GoSettle"); }
+	public function Go(player : Player) { Main.MainConsole.Log("GoSettle"); }
 	
 	public function IsValidFor(player : Player, cell : Cell) : Bool
 	{
 		if (cell.Player == player) return false;
+		
+		if ((cell.Energy > player.Energy) ||
+		    (cell.Military > player.Military))
+		{
+			return false;
+		}
 		
 		return cell.Visible;
 	}
@@ -63,18 +73,33 @@ class PhaseSettle implements Phase
 	public function ActionFor(player : Player, cell : Cell)
 	{
 		Main.MainConsole.Log("ActionForSettle");
+		player.Energy -= cell.Energy;
 		cell.Player = player;
 		cell.Update();
 	}
 }
 
-enum Flow
+class PhaseProduce implements Phase
 {
-	Select;
-	Explore;
-	Settle;
-	Upkeep;
+	public function new() {}
+
+	public function Go(player : Player) { Main.MainConsole.Log("GoProduce"); }
+	
+	public function IsValidFor(player : Player, cell : Cell) : Bool
+	{
+		return (cell.Player == player) && (cell.Production > 0);
+	}
+	
+	public function ActionFor(player : Player, cell : Cell)
+	{
+		Main.MainConsole.Log("ActionForProduce");
+		player.Energy += cell.Production;
+		cell.Production -= 1;
+		cell.Update();
+	}
 }
+
+enum Flow { Select; Explore; Settle; Produce;  Upkeep; }
 
 class Rules
 {
@@ -105,6 +130,7 @@ class Rules
 		
 		Main.MainGui.Explore.addEventListener(Global.EXPLORE, OnExplore);
 		Main.MainGui.Settle .addEventListener(Global.SETTLE,  OnSettle);
+		Main.MainGui.Produce.addEventListener(Global.PRODUCE, OnProduce);
 		Main.MainGui.Pass   .addEventListener(Global.PASS,    OnPass);
 		Main.MainGui.Go     .addEventListener(Global.GO,      OnGo);
 	}
@@ -131,6 +157,7 @@ class Rules
 			
 			NextStep();
 			UpdatePhase();
+			CurrentPhase.Go(CurrentPlayer);
 			UpdateCells();
 		}
 	}
@@ -165,6 +192,7 @@ class Rules
 			case Flow.Select:  CurrentPhase = new PhaseNone();
 			case Flow.Explore: CurrentPhase = new PhaseExplore();
 			case Flow.Settle:  CurrentPhase = new PhaseSettle();
+			case Flow.Produce: CurrentPhase = new PhaseProduce();
 			case Flow.Upkeep:  CurrentPhase = new PhaseNone();
 			default:
 		}
@@ -176,7 +204,8 @@ class Rules
 		{
 			case Flow.Select:  SetStep(Flow.Explore);
 			case Flow.Explore: SetStep(Flow.Settle);
-			case Flow.Settle:  SetStep(Flow.Upkeep);
+			case Flow.Settle:  SetStep(Flow.Produce);
+			case Flow.Produce: SetStep(Flow.Upkeep);
 			case Flow.Upkeep:  SetStep(Flow.Select);
 		}
 	}
@@ -213,13 +242,20 @@ class Rules
 				Main.MainGui.Pass.setActive(true);
 			}
 			
+			case Flow.Produce:
+			{
+				
+			}
+			
 			case Flow.Upkeep:
 			{
 				Phase = Global.NONE;
+				CurrentPlayer.Phase = Global.NONE;
 				Main.MainGui.Explore.setActive(false);
 				Main.MainGui.Settle.setActive(false);
 				Main.MainGui.Go.setActive(false);
 				Main.MainGui.Pass.setActive(true);
+				NextStep();
 			}
 		}
 	}
@@ -238,11 +274,19 @@ class Rules
 		Main.MainGui.Go.setActive(true);
 	}
 	
+	function OnProduce(event : Event)
+	{
+		Main.MainConsole.Log("OnProduce");
+		CurrentPlayer.Phase = Global.PRODUCE;
+		Main.MainGui.Go.setActive(true);
+	}
+	
 	function OnGo(event : Event)
 	{
 		Main.MainConsole.Log("OnGo");
 		NextStep();
 		UpdatePhase();
+		CurrentPhase.Go(CurrentPlayer);
 		UpdateCells();
 	}
 	
@@ -251,6 +295,7 @@ class Rules
 		Main.MainConsole.Log("OnPass");
 		NextStep();
 		UpdatePhase();
+		CurrentPhase.Go(CurrentPlayer);
 		UpdateCells();
 	}
 	

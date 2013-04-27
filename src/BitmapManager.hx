@@ -31,37 +31,21 @@ class BitmapManager
 		register("CELL_P3", MakeRect(3, 0));
 		register("CELL_P3_SELECTED", MakeRect(3, 1));
 		
-		register("ENERGY_0", MakeRect(4, 0));
-		register("ENERGY_1", MakeRect(4, 1));
-		register("ENERGY_2", MakeRect(4, 2));
-		register("ENERGY_3", MakeRect(4, 3));
-		register("ENERGY_4", MakeRect(4, 4));
-		register("ENERGY_5", MakeRect(4, 5));
-		register("ENERGY_6", MakeRect(4, 6));
-		register("ENERGY_7", MakeRect(4, 7));
-		register("ENERGY_8", MakeRect(4, 8));
-		register("ENERGY_9", MakeRect(4, 9));
+		for (i in 0...10) register("ENERGY_" + Std.string(i), MakeRect(4, i));
+		for (i in 0...10) register("MILITARY_" + Std.string(i), MakeRect(5, i));
+		for (i in 0...10) register("PRODUCTION_" + Std.string(i), MakeRect(6, i));
 
-		register("MILITARY_0", MakeRect(5, 0));
-		register("MILITARY_1", MakeRect(5, 1));
-		register("MILITARY_2", MakeRect(5, 2));
-		register("MILITARY_3", MakeRect(5, 3));
-		register("MILITARY_4", MakeRect(5, 4));
-		register("MILITARY_5", MakeRect(5, 5));
-		register("MILITARY_6", MakeRect(5, 6));
-		register("MILITARY_7", MakeRect(5, 7));
-		register("MILITARY_8", MakeRect(5, 8));
-		register("MILITARY_9", MakeRect(5, 9));
+		register(Global.EXPLORE, MakeRect(7, 0));
+		register(Global.SETTLE,  MakeRect(7, 1));
+		register(Global.PRODUCE, MakeRect(7, 2));
+		register(Global.GO,      MakeRect(7, 3));
+		register(Global.PASS,    MakeRect(7, 4));
+		register(Global.DONE,    MakeRect(7, 5));
 		
-		register(Global.EXPLORE, MakeRect(6, 0));
-		register(Global.SETTLE,  MakeRect(6, 1));
-		register(Global.GO,      MakeRect(6, 2));
-		register(Global.PASS,    MakeRect(6, 3));
-		
-		register(Global.PHASE, MakeRect(6, 4));
-		register(Global.RED,   MakeRect(6, 5));
-		register(Global.GREEN, MakeRect(6, 6));
-		register(Global.BLUE,  MakeRect(6, 7));
+		register(Global.PHASE, MakeRect(7, 6));
+		register(Global.RED,   MakeRect(7, 7));
+		register(Global.GREEN, MakeRect(7, 8));
+		register(Global.BLUE,  MakeRect(7, 9));
 	}
 	
 	function MakeRect(line : Int, column : Int) : Rectangle

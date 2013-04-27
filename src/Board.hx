@@ -67,6 +67,7 @@ class Board extends Sprite
 				current.Player = Global.NOBODY;
 				current.Energy = Std.random(10);
 				current.Military = Std.random(10);
+				current.Production = Std.random(10);
 				
 				current.Update();
 			}

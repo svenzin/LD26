@@ -83,16 +83,21 @@ class GUI extends Sprite
 		Settle.x = buttonX;
 		Settle.y = 70 + 10;
 		
+		Produce = new Button(Global.PRODUCE);
+		Produce.x = buttonX;
+		Produce.y = 140 + 10;
+		
 		Go = new Button(Global.GO);
 		Go.x = buttonX;
-		Go.y = 210;
+		Go.y = 310;
 		
 		Pass = new Button(Global.PASS);
 		Pass.x = buttonX;
-		Pass.y = 280;
+		Pass.y = 380;
 		
 		addChild(Explore);
 		addChild(Settle);
+		addChild(Produce);
 		addChild(Go);
 		addChild(Pass);
 		
@@ -114,6 +119,7 @@ class GUI extends Sprite
 		{
 			case Global.EXPLORE: { item.x = Explore.x; item.y = Explore.y; }
 			case Global.SETTLE:  { item.x = Settle.x; item.y = Settle.y; }
+			case Global.PRODUCE: { item.x = Produce.x; item.y = Produce.y; }
 			default:             { item.visible = false; }
 		}
 	}
@@ -152,6 +158,7 @@ class GUI extends Sprite
 	
 	public var Explore : Button;
 	public var Settle  : Button;
+	public var Produce : Button;
 	public var Go      : Button;
 	public var Pass    : Button;
 }

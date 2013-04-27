@@ -10,6 +10,7 @@ class Player
 	public function new(id : Int) 
 	{
 		Id = id;
+		Energy = 4;
 		Military = 0;
 		Points = 0;
 		

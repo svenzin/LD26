@@ -54,33 +54,9 @@ class Cell extends Sprite
 
 		if (Visible)
 		{
-			switch (Energy)
-			{
-				case 0: m_display.addChild(Main.MainBitmaps.get("ENERGY_0"));
-				case 1: m_display.addChild(Main.MainBitmaps.get("ENERGY_1"));
-				case 2: m_display.addChild(Main.MainBitmaps.get("ENERGY_2"));
-				case 3: m_display.addChild(Main.MainBitmaps.get("ENERGY_3"));
-				case 4: m_display.addChild(Main.MainBitmaps.get("ENERGY_4"));
-				case 5: m_display.addChild(Main.MainBitmaps.get("ENERGY_5"));
-				case 6: m_display.addChild(Main.MainBitmaps.get("ENERGY_6"));
-				case 7: m_display.addChild(Main.MainBitmaps.get("ENERGY_7"));
-				case 8: m_display.addChild(Main.MainBitmaps.get("ENERGY_8"));
-				case 9: m_display.addChild(Main.MainBitmaps.get("ENERGY_9"));
-			}
-
-			switch (Military)
-			{
-				case 0: m_display.addChild(Main.MainBitmaps.get("MILITARY_0"));
-				case 1: m_display.addChild(Main.MainBitmaps.get("MILITARY_1"));
-				case 2: m_display.addChild(Main.MainBitmaps.get("MILITARY_2"));
-				case 3: m_display.addChild(Main.MainBitmaps.get("MILITARY_3"));
-				case 4: m_display.addChild(Main.MainBitmaps.get("MILITARY_4"));
-				case 5: m_display.addChild(Main.MainBitmaps.get("MILITARY_5"));
-				case 6: m_display.addChild(Main.MainBitmaps.get("MILITARY_6"));
-				case 7: m_display.addChild(Main.MainBitmaps.get("MILITARY_7"));
-				case 8: m_display.addChild(Main.MainBitmaps.get("MILITARY_8"));
-				case 9: m_display.addChild(Main.MainBitmaps.get("MILITARY_9"));
-			}
+			m_display.addChild(Main.MainBitmaps.get("ENERGY_" + Std.string(Energy)));
+			m_display.addChild(Main.MainBitmaps.get("MILITARY_" + Std.string(Military)));
+			m_display.addChild(Main.MainBitmaps.get("PRODUCTION_" + Std.string(Production)));
 		}
 	}
 	
@@ -89,6 +65,7 @@ class Cell extends Sprite
 	public var Player : Player;
 	public var Energy : Int;
 	public var Military : Int;
+	public var Production : Int;
 	
 	public var Visible : Bool = false;
 	public var Selected : Bool = false;
