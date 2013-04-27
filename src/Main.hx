@@ -15,6 +15,8 @@ class Main extends Sprite
 	public static var MainConsole : Console;
 	public static var MainBitmaps : BitmapManager;
 	public static var MainBoard : Board;
+	public static var MainGui : GUI;
+	public static var MainRules : Rules;
 
 	/* ENTRY POINT */
 	
@@ -31,12 +33,19 @@ class Main extends Sprite
 
 		// (your code here)
 		MainBitmaps = new BitmapManager();
-		MainBoard = new Board(8, 8);
 		
+		MainBoard = new Board();
 		addChild(MainBoard);
+		MainBoard.generate(8, 8);
+		
+		MainGui = new GUI();
+		addChild(MainGui);
 		
 		MainConsole = new Console();
 		addChild(MainConsole);
+		
+		MainRules = new Rules();
+		MainRules.start();
 		// Stage:
 		// stage.stageWidth x stage.stageHeight @ stage.dpiScale
 		

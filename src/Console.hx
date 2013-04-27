@@ -1,6 +1,7 @@
 package ;
 import nme.display.Sprite;
 import nme.text.TextField;
+import nme.text.TextFieldAutoSize;
 
 /**
  * ...
@@ -15,7 +16,8 @@ class Console extends Sprite
 		
 		Message = new TextField();
 		Message.x = 0;
-		Message.y = 0;
+		Message.y = 520;
+		Message.autoSize = TextFieldAutoSize.LEFT;
 		
 		Log("Hello");
 		

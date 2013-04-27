@@ -19,7 +19,8 @@ class BitmapManager
 		m_tiles = new Hash();
 		
 		register("CELL_P0", MakeRect(0, 0));
-		register("CELL_P0_SELECTED", MakeRect(0, 1));
+		register("CELL_SELECTED", MakeRect(0, 1));
+		register("CELL_DISABLED", MakeRect(0, 2));
 		
 		register("CELL_P1", MakeRect(1, 0));
 		register("CELL_P1_SELECTED", MakeRect(1, 1));
@@ -51,6 +52,16 @@ class BitmapManager
 		register("MILITARY_7", MakeRect(5, 7));
 		register("MILITARY_8", MakeRect(5, 8));
 		register("MILITARY_9", MakeRect(5, 9));
+		
+		register(Global.EXPLORE, MakeRect(6, 0));
+		register(Global.SETTLE,  MakeRect(6, 1));
+		register(Global.GO,      MakeRect(6, 2));
+		register(Global.PASS,    MakeRect(6, 3));
+		
+		register(Global.PHASE, MakeRect(6, 4));
+		register(Global.RED,   MakeRect(6, 5));
+		register(Global.GREEN, MakeRect(6, 6));
+		register(Global.BLUE,  MakeRect(6, 7));
 	}
 	
 	function MakeRect(line : Int, column : Int) : Rectangle

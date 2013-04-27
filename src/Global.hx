@@ -15,4 +15,20 @@ class Global
 	public static var Debug : Bool = true;
 	
 	public static var CellSize : Int = 64;
+	
+	public static var Width : Int = 960;
+	public static var Height : Int = 540;
+	
+	public static var NONE    : String = "None";
+	public static var EXPLORE : String = "Explore";
+	public static var SETTLE  : String = "Settle";
+	public static var GO      : String = "Go";
+	public static var PASS    : String = "Pass";
+	
+	public static var PHASE : String = "Phase";
+	public static var RED   : String = "Red";
+	public static var GREEN : String = "Green";
+	public static var BLUE  : String = "Blue";
+	
+	public static var NOBODY : Player = new Player(0);
 }
