@@ -12,6 +12,7 @@ import nme.Lib;
 class Main extends Sprite 
 {
 	var inited:Bool;
+
 	public static var MainConsole : Console;
 	public static var MainBitmaps : BitmapManager;
 	public static var MainBoard : Board;
@@ -30,8 +31,7 @@ class Main extends Sprite
 	{
 		if (inited) return;
 		inited = true;
-
-		// (your code here)
+		
 		MainBitmaps = new BitmapManager();
 		
 		MainBoard = new Board();
@@ -47,7 +47,10 @@ class Main extends Sprite
 		MainRules = new Rules();
 		MainRules.start();
 		
+		// (your code here)
+		//
 		addEventListener(Event.ENTER_FRAME, loop);
+		
 		// Stage:
 		// stage.stageWidth x stage.stageHeight @ stage.dpiScale
 		
@@ -55,11 +58,6 @@ class Main extends Sprite
 		// nme.Assets.getBitmapData("img/assetname.jpg");
 	}
 	
-	function loop(event : Event)
-	{
-		MainRules.SingleLoop();
-	}
-
 	/* SETUP */
 
 	public function new() 
@@ -67,8 +65,13 @@ class Main extends Sprite
 		super();	
 		addEventListener(Event.ADDED_TO_STAGE, added);
 	}
+	
+	function loop(event : Event)
+	{
+		MainRules.SingleLoop();
+	}
 
-	function added(e) 
+	function added(e)
 	{
 		removeEventListener(Event.ADDED_TO_STAGE, added);
 		stage.addEventListener(Event.RESIZE, resize);

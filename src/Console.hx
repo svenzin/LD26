@@ -21,7 +21,7 @@ class Console extends Sprite
 		
 		Log("Hello");
 		
-		addChild(Message);
+		//addChild(Message);
 	}
 	
 	function Set(caption : String, color : Int)

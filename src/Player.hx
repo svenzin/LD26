@@ -10,9 +10,9 @@ class Player
 	public function new(id : Int) 
 	{
 		Id = id;
-		Energy = 4;
-		Military = 0;
-		Points = 0;
+		Energy = 0;
+		Spending = 0;
+		Production = 0;
 		
 		Phase = Global.NONE;
 	}
@@ -24,8 +24,8 @@ class Player
 	
 	public var Id : Int;
 	public var Energy : Int;
-	public var Military : Int;
-	public var Points : Int;
+	public var Spending : Int;
+	public var Production : Int;
 	
 	public var Phase : String;
 }

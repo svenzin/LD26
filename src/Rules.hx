@@ -12,16 +12,16 @@ interface Phase
 	function Go(player : Player) : Void;
 	function IsValidFor(player : Player, cell : Cell) : Bool;
 	function ActionFor(player : Player, cell : Cell) : Void;
-	function SuperactionFor(player : Player, cell : Cell) : Void;
+	function Cost() : Int;
 }
 
 class PhaseNone implements Phase
 {
 	public function new() {}
 	public function Go(player : Player) { Main.MainConsole.Log("GoNone"); }
-	public function IsValidFor(player : Player, cell : Cell) : Bool { return true; }
+	public function IsValidFor(player : Player, cell : Cell) : Bool { return false; }
 	public function ActionFor(player : Player, cell : Cell) { Main.MainConsole.Log("ActionForNone"); }
-	public function SuperactionFor(player : Player, cell : Cell) { Main.MainConsole.Log("SuperactionForNone"); }
+	public function Cost() : Int { return 0; }
 }
 
 class PhaseExplore implements Phase
@@ -48,25 +48,14 @@ class PhaseExplore implements Phase
 	public function ActionFor(player : Player, cell : Cell)
 	{
 		Main.MainConsole.Log("ActionForExplore");
-		cell.Visible = true;
-		cell.Update();
-	}
-
-	public function SuperactionFor(player : Player, cell : Cell)
-	{
-		Main.MainConsole.Log("SuperactionForExplore");
-		
-		player.Energy -= 1;
-		
-		cell.Visible = true;
-		cell.Update();
-		
+		cell.Visible.Add(player);
 		for (other in Main.MainBoard.neighbours(cell))
 		{
-			other.Visible = true;
-			other.Update();
+			other.Visible.Add(player);
 		}
 	}
+	
+	public function Cost() : Int { return 1; }
 }
 
 class PhaseSettle implements Phase
@@ -78,32 +67,25 @@ class PhaseSettle implements Phase
 	public function IsValidFor(player : Player, cell : Cell) : Bool
 	{
 		if (cell.Player == player) return false;
+		if (cell.Energy + cell.Production > player.Energy) return false;
+		if (!cell.Visible.Check(player)) return false;
 		
-		if ((cell.Energy > player.Energy) ||
-		    (cell.Military > player.Military))
+		for (other in Main.MainBoard.neighbours(cell))
 		{
-			return false;
+			if (other.Player == player) return true;
 		}
 		
-		return cell.Visible;
+		return false;
 	}
 	
 	public function ActionFor(player : Player, cell : Cell)
 	{
 		Main.MainConsole.Log("ActionForSettle");
-		player.Energy -= cell.Energy;
+		player.Spending -= cell.Energy;
 		cell.Player = player;
-		cell.Update();
 	}
-
-		public function SuperactionFor(player : Player, cell : Cell)
-	{
-		Main.MainConsole.Log("SuperactionForSettle");
-		player.Energy += 1;
-		player.Energy -= cell.Energy;
-		cell.Player = player;
-		cell.Update();
-	}
+	
+	public function Cost() : Int { return 0; }
 }
 
 class PhaseProduce implements Phase
@@ -120,25 +102,50 @@ class PhaseProduce implements Phase
 	public function ActionFor(player : Player, cell : Cell)
 	{
 		Main.MainConsole.Log("ActionForProduce");
-		player.Energy += cell.Production;
-		if (cell.Production > 1) cell.Production -= 2; else cell.Production = 0;
-		cell.Update();
+		player.Spending += cell.Production;
 	}
+	
+	public function Cost() { return 0; }
+}
 
-	public function SuperactionFor(player : Player, cell : Cell)
+class PhaseUpkeep implements Phase
+{
+	public function new() {}
+
+	public function Go(player : Player) { Main.MainConsole.Log("GoUpkeep"); }
+	
+	public function IsValidFor(player : Player, cell : Cell) : Bool
 	{
-		Main.MainConsole.Log("SuperactionForProduce");
-		player.Energy += cell.Production;
-		cell.Production -= 1;
-		cell.Update();
+		if (cell.Player != player) return false;
+		
+		if (player.Spending > 0) return cell.Energy < Global.MAX_ENERGY;
+		if (player.Spending < 0) return cell.Energy > 0;
+		
+		return false;
 	}
+	
+	public function ActionFor(player : Player, cell : Cell)
+	{
+		Main.MainConsole.Log("ActionForProduce");
+		if (player.Spending > 0)
+		{
+			cell.Energy += 1;
+			player.Spending -= 1;
+		}
+		else if (player.Spending < 0)
+		{
+			cell.Energy -= 1;
+			player.Spending += 1;
+		}
+	}
+	
+	public function Cost() { return 0; }
 }
 
 enum Flow { Init; Select; Explore; Settle; Produce; Upkeep; }
 
 class Rules
 {
-	public var CurrentPlayer : Player;
 	public var Players : Array<Player>;
 	public var Phase : String;
 	
@@ -166,19 +173,36 @@ class Rules
 		Main.MainGui.Settle .addEventListener(Global.SETTLE,  OnSettle);
 		Main.MainGui.Produce.addEventListener(Global.PRODUCE, OnProduce);
 		Main.MainGui.Pass   .addEventListener(Global.PASS,    OnPass);
-		Main.MainGui.Go     .addEventListener(Global.GO,      OnGo);
-		Main.MainGui.Done   .addEventListener(Global.DONE,    OnDone);
 	}
 
 	public function start()
 	{
-		CurrentPlayer = Players[0];
+		var start : Cell;
 		
-		var start = Main.MainBoard.at(Std.random(Main.MainBoard.SizeX), Std.random(Main.MainBoard.SizeY));
-		start.Player = CurrentPlayer;
-		start.Visible = true;
-		start.Update();
+		start = Main.MainBoard.at(Std.random(Main.MainBoard.SizeX), Std.random(Main.MainBoard.SizeY));
+		start.Player = Players[0];
+		start.Energy = 2;
+		start.Production = 2;
+		start.Visible.Add(Players[0]);
 		
+		while (start.Player == Players[0])
+		{
+			start = Main.MainBoard.at(Std.random(Main.MainBoard.SizeX), Std.random(Main.MainBoard.SizeY));
+		}
+		start.Player = Players[1];
+		start.Energy = 2;
+		start.Production = 2;
+		start.Visible.Add(Players[1]);
+		
+		while (start.Player == Players[0] || start.Player == Players[1])
+		{
+			start = Main.MainBoard.at(Std.random(Main.MainBoard.SizeX), Std.random(Main.MainBoard.SizeY));
+		}
+		start.Player = Players[2];
+		start.Energy = 2;
+		start.Production = 2;
+		start.Visible.Add(Players[2]);
+
 		for (cell in Main.MainBoard.Cells)
 		{
 			cell.addEventListener(MouseEvent.CLICK, OnCellClicked);
@@ -186,7 +210,8 @@ class Rules
 		
 		SetStep(Flow.Init);
 		
-		UpdatePhase();
+		UpdatePlayers();
+		UpdateCells();
 		UpdateProcess();
 		
 		ResetProcessedPlayers(true);
@@ -196,15 +221,37 @@ class Rules
 	{
 		if (FinishedProcessingPlayers())
 		{
-			Main.MainConsole.Log("Moving to next step");
+			//Main.MainConsole.Log("Moving to next step");
 			NextStep();
 			
 			UpdateProcess();
 			
-			//UpdateCells();
+			if (CurrentStep == Flow.Upkeep) DetectEndGame();
+			if (CurrentStep == Flow.Upkeep) PostProcess();
 			
 			ResetProcessedPlayers(false);
 			Process();
+		}
+	}
+	
+	function PostProcess()
+	{
+		for (cell in Main.MainBoard.Cells)
+		{
+			if (cell.Energy > Global.MAX_STABLE_ENERGY) cell.Energy -= 1;
+		}
+	}
+	
+	function IsDead(player : Player) : Bool { return player.Spending + player.Energy < 0;  }
+	function DetectEndGame()
+	{
+		if (IsDead(Players[0]))
+		{
+			
+		}
+		if (IsDead(Players[1]) && IsDead(Players[2]))
+		{
+			
 		}
 	}
 	
@@ -217,16 +264,72 @@ class Rules
 	}
 	function HumanSelect(player : Player) { }
 	function HumanExplore(player : Player) { }
+	function HumanDevelop(player : Player) { }
 	function HumanSettle(player : Player) { }
 	function HumanProduce(player : Player) { }
+	function HumanUpkeep(player : Player) { if (player.Spending == 0) ProcessedPlayers.set(player, true); }
 	
-	function AISelect(player : Player) { player.Phase = Global.EXPLORE; ProcessedPlayers.set(player, true); }
-	function AIExplore(player : Player) { ProcessedPlayers.set(player, true); }
-	function AISettle(player : Player) { ProcessedPlayers.set(player, true); }
-	function AIProduce(player : Player) { ProcessedPlayers.set(player, true); }
+	function AISelect(player : Player)
+	{
+		switch (Std.random(3))
+		{
+			case 0: player.Phase = Global.EXPLORE;
+			case 1: player.Phase = Global.SETTLE;
+			case 2: player.Phase = Global.PRODUCE;
+		}
+		ProcessedPlayers.set(player, true);
+	}
+	function AIExplore(player : Player)
+	{
+		for (cell in Main.MainBoard.Cells)
+		{
+			if (CurrentPhase.IsValidFor(player, cell) && !cell.Visible.Check(player))
+			{
+				ExecuteAction(player, cell);
+				break;
+			}
+		}
+		ProcessedPlayers.set(player, true);
+	}
+	function AIDevelop(player : Player)
+	{
+		
+	}
+	function AISettle(player : Player)
+	{
+		for (cell in Main.MainBoard.Cells)
+		{
+			if (CurrentPhase.IsValidFor(player, cell))
+			{
+				ExecuteAction(player, cell);
+				break;
+			}
+		}
+		ProcessedPlayers.set(player, true);
+	}
+	function AIProduce(player : Player)
+	{
+		for (cell in Main.MainBoard.Cells)
+		{
+			if (CurrentPhase.IsValidFor(player, cell))
+			{
+				ExecuteAction(player, cell);
+				break;
+			}
+		}
+		ProcessedPlayers.set(player, true);
+	}
+	function AIUpkeep(player : Player)
+	{
+		player.Phase = Global.NONE;
+		ProcessedPlayers.set(player, true);
+	}
 	
 	function ProcessNothing()
 	{
+		UpdatePlayers();
+		UpdateCells();
+		
 		ProcessedPlayers.set(Players[0], true);
 		ProcessedPlayers.set(Players[1], true);
 		ProcessedPlayers.set(Players[2], true);
@@ -234,71 +337,77 @@ class Rules
 	
 	function ProcessSelect()
 	{
-		AISelect(Players[2]);
-		AISelect(Players[1]);
-		
-		UpdatePlayer();
-		UpdatePhase();
+		UpdatePlayers();
 		UpdateCells();
 		
+		AISelect(Players[2]);
+		AISelect(Players[1]);
 		HumanSelect(Players[0]);
 	}
 	
 	function ProcessExplore()
 	{
-		AIExplore(Players[2]);
-		AIExplore(Players[1]);
-		
-		UpdatePlayer();
-		UpdatePhase();
+		UpdatePlayers();
 		UpdateCells();
 		
-		HumanExplore(Players[0]);
+		if (Players[2].Phase == Global.EXPLORE) AIExplore(Players[2]);    else ProcessedPlayers.set(Players[2], true);
+		if (Players[1].Phase == Global.EXPLORE) AIExplore(Players[1]);    else ProcessedPlayers.set(Players[1], true);
+		if (Players[0].Phase == Global.EXPLORE) HumanExplore(Players[0]); else ProcessedPlayers.set(Players[0], true);
 	}
 	
 	function ProcessSettle()
 	{
-		AISettle(Players[2]);
-		AISettle(Players[1]);
-		
-		UpdatePlayer();
-		UpdatePhase();
+		UpdatePlayers();
 		UpdateCells();
 		
-		HumanSettle(Players[0]);
+		if (Players[2].Phase == Global.SETTLE) AISettle(Players[2]);    else ProcessedPlayers.set(Players[2], true);
+		if (Players[1].Phase == Global.SETTLE) AISettle(Players[1]);    else ProcessedPlayers.set(Players[1], true);
+		if (Players[0].Phase == Global.SETTLE) HumanSettle(Players[0]); else ProcessedPlayers.set(Players[0], true);
 	}
 	
 	function ProcessProduce()
 	{
-		AIProduce(Players[2]);
-		AIProduce(Players[1]);
-		
-		UpdatePlayer();
-		UpdatePhase();
+		UpdatePlayers();
 		UpdateCells();
 		
-		HumanProduce(Players[0]);
+		if (Players[2].Phase == Global.PRODUCE) AIProduce(Players[2]);    else ProcessedPlayers.set(Players[2], true);
+		if (Players[1].Phase == Global.PRODUCE) AIProduce(Players[1]);    else ProcessedPlayers.set(Players[1], true);
+		if (Players[0].Phase == Global.PRODUCE) HumanProduce(Players[0]); else ProcessedPlayers.set(Players[0], true);
+	}
+	
+	function ProcessUpkeep()
+	{
+		UpdatePlayers();
+		UpdateCells();
+		
+		AIUpkeep(Players[2]);
+		AIUpkeep(Players[1]);
+		HumanUpkeep(Players[0]);
+	}
+	
+	function ExecuteAction(player : Player, cell : Cell)
+	{
+		player.Spending -= CurrentPhase.Cost();
+		CurrentPhase.ActionFor(player, cell);
+		
+		if (CurrentStep == Flow.Upkeep)
+		{
+			if (player.Spending == 0) ProcessedPlayers.set(player, true);
+		}
+		else
+		{
+			ProcessedPlayers.set(player, true);
+		}
+
+		UpdatePlayers();
+		UpdateCells();
 	}
 	
 	function OnCellClicked(event : MouseEvent)
 	{
-		if (CurrentPhase.IsValidFor(CurrentPlayer, event.currentTarget))
+		if (CurrentPhase.IsValidFor(Players[0], event.currentTarget))
 		{
-			if (CurrentPlayer.Phase == Phase)
-			{
-				CurrentPhase.SuperactionFor(CurrentPlayer, event.currentTarget);
-			}
-			else
-			{
-				CurrentPhase.ActionFor(CurrentPlayer, event.currentTarget);
-			}
-			//UpdatePlayer();
-			
-			//NextStep();
-			//UpdatePhase();
-			//CurrentPhase.Go(CurrentPlayer);
-			//UpdateCells();
-			ProcessedPlayers.set(Players[0], true);
+			ExecuteAction(Players[0], event.currentTarget);
 		}
 	}
 	
@@ -306,21 +415,24 @@ class Rules
 	{
 		for (cell in Main.MainBoard.Cells)
 		{
-			cell.Active = CurrentPhase.IsValidFor(CurrentPlayer, cell);
-			cell.Update();
+			cell.Active = CurrentPhase.IsValidFor(Players[0], cell);
+			cell.Update(Players[0]);
 		}
 	}
 	
-	function UpdatePlayer()
+	function UpdatePlayers()
 	{
-		CurrentPlayer.Military = 0;
-		CurrentPlayer.Points = 0;
-		for (cell in Main.MainBoard.Cells)
+		for (player in Players)
 		{
-			if (cell.Player == CurrentPlayer)
+			player.Energy = 0;
+			player.Production = 0;
+			for (cell in Main.MainBoard.Cells)
 			{
-				CurrentPlayer.Military += cell.Military;
-				CurrentPlayer.Points += cell.Energy;
+				if (cell.Player == player)
+				{
+					player.Energy += cell.Energy;
+					player.Production += cell.Production;
+				}
 			}
 		}
 	}
@@ -334,7 +446,7 @@ class Rules
 			case Flow.Explore: { Phase = Global.EXPLORE; CurrentPhase = new PhaseExplore(); }
 			case Flow.Settle:  { Phase = Global.SETTLE;  CurrentPhase = new PhaseSettle(); }
 			case Flow.Produce: { Phase = Global.PRODUCE; CurrentPhase = new PhaseProduce(); }
-			case Flow.Upkeep:  { Phase = Global.NONE;    CurrentPhase = new PhaseNone(); }
+			case Flow.Upkeep:  { Phase = Global.UPKEEP;  CurrentPhase = new PhaseUpkeep(); }
 			default:
 		}
 	}
@@ -347,6 +459,7 @@ class Rules
 			case Flow.Explore: Process = ProcessExplore;
 			case Flow.Settle:  Process = ProcessSettle;
 			case Flow.Produce: Process = ProcessProduce;
+			case Flow.Upkeep:  Process = ProcessUpkeep;
 			default:           Process = ProcessNothing;
 		}
 	}
@@ -372,68 +485,63 @@ class Rules
 	function SetStep(step : Flow)
 	{
 		CurrentStep = step;
+		
+		UpdatePhase();
+		
 		switch (step)
 		{
 			case Flow.Init:
 			{
 				Main.MainGui.Explore.setActive(false);
-				Main.MainGui.Settle.setActive(false);
+				Main.MainGui.Settle .setActive(false);
 				Main.MainGui.Produce.setActive(false);
-				Main.MainGui.Go.setActive(false);
-				Main.MainGui.Pass.setActive(false);
-				Main.MainGui.Done.setActive(false);
+				Main.MainGui.Upkeep .setActive(false);
+				Main.MainGui.Pass   .setActive(false);
 			}
 			
 			case Flow.Select:
 			{
-				Main.MainGui.Explore.setActive(true);
-				Main.MainGui.Settle.setActive(true);
-				Main.MainGui.Produce.setActive(true);
-				Main.MainGui.Go.setActive(false);
-				Main.MainGui.Pass.setActive(false);
-				Main.MainGui.Done.setActive(false);
+				Main.MainGui.Explore.setActive(Players[0].Energy >= new PhaseExplore().Cost());
+				Main.MainGui.Settle .setActive(Players[0].Energy >= new PhaseSettle().Cost());
+				Main.MainGui.Produce.setActive(Players[0].Energy >= new PhaseProduce().Cost());
+				Main.MainGui.Upkeep.setActive(false);
+				Main.MainGui.Pass  .setActive(false);
 			}
 			
 			case Flow.Explore:
 			{
 				Main.MainGui.Explore.setActive(false);
-				Main.MainGui.Settle.setActive(false);
+				Main.MainGui.Settle .setActive(false);
 				Main.MainGui.Produce.setActive(false);
-				Main.MainGui.Go.setActive(false);
-				Main.MainGui.Pass.setActive(false);
-				Main.MainGui.Done.setActive(true);
+				Main.MainGui.Upkeep .setActive(false);
+				Main.MainGui.Pass   .setActive(true);
 			}
 			
 			case Flow.Settle:
 			{
 				Main.MainGui.Explore.setActive(false);
-				Main.MainGui.Settle.setActive(false);
+				Main.MainGui.Settle .setActive(false);
 				Main.MainGui.Produce.setActive(false);
-				Main.MainGui.Go.setActive(false);
-				Main.MainGui.Pass.setActive(false);
-				Main.MainGui.Done.setActive(true);
+				Main.MainGui.Upkeep .setActive(false);
+				Main.MainGui.Pass   .setActive(true);
 			}
 			
 			case Flow.Produce:
 			{
 				Main.MainGui.Explore.setActive(false);
-				Main.MainGui.Settle.setActive(false);
+				Main.MainGui.Settle .setActive(false);
 				Main.MainGui.Produce.setActive(false);
-				Main.MainGui.Go.setActive(false);
-				Main.MainGui.Pass.setActive(false);
-				Main.MainGui.Done.setActive(true);
+				Main.MainGui.Upkeep .setActive(false);
+				Main.MainGui.Pass   .setActive(true);
 			}
 			
 			case Flow.Upkeep:
 			{
-				//Phase = Global.NONE;
-				CurrentPlayer.Phase = Global.NONE;
-				//Main.MainGui.Explore.setActive(false);
-				//Main.MainGui.Settle.setActive(false);
-				//Main.MainGui.Produce.setActive(false);
-				//Main.MainGui.Go.setActive(false);
-				//Main.MainGui.Pass.setActive(true);
-				NextStep();
+				Main.MainGui.Explore.setActive(false);
+				Main.MainGui.Settle .setActive(false);
+				Main.MainGui.Produce.setActive(false);
+				Main.MainGui.Upkeep .setActive(true);
+				Main.MainGui.Pass   .setActive(false);
 			}
 		}
 	}
@@ -441,47 +549,30 @@ class Rules
 	function OnExplore(event : Event)
 	{
 		Main.MainConsole.Log("OnExplore");
-		CurrentPlayer.Phase = Global.EXPLORE;
-		Main.MainGui.Done.setActive(true);
+		Players[0].Phase = Global.EXPLORE;
+		//Main.MainGui.Done.setActive(true);
+		ProcessedPlayers.set(Players[0], true);
 	}
 	
 	function OnSettle(event : Event)
 	{
 		Main.MainConsole.Log("OnSettle");
-		CurrentPlayer.Phase = Global.SETTLE;
-		Main.MainGui.Done.setActive(true);
+		Players[0].Phase = Global.SETTLE;
+		//Main.MainGui.Done.setActive(true);
+		ProcessedPlayers.set(Players[0], true);
 	}
 	
 	function OnProduce(event : Event)
 	{
 		Main.MainConsole.Log("OnProduce");
-		CurrentPlayer.Phase = Global.PRODUCE;
-		Main.MainGui.Done.setActive(true);
-	}
-	
-	function OnGo(event : Event)
-	{
-		Main.MainConsole.Log("OnGo");
+		Players[0].Phase = Global.PRODUCE;
+		//Main.MainGui.Done.setActive(true);
 		ProcessedPlayers.set(Players[0], true);
-		//NextStep();
-		//UpdatePhase();
-		//CurrentPhase.Go(CurrentPlayer);
-		//UpdateCells();
 	}
 	
 	function OnPass(event : Event)
 	{
 		Main.MainConsole.Log("OnPass");
-		ProcessedPlayers.set(Players[0], true);
-		//NextStep();
-		//UpdatePhase();
-		//CurrentPhase.Go(CurrentPlayer);
-		//UpdateCells();
-	}
-	
-	function OnDone(event : Event)
-	{
-		Main.MainConsole.Log("OnDone");
 		ProcessedPlayers.set(Players[0], true);
 	}
 	

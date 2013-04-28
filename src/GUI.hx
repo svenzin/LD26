@@ -77,15 +77,23 @@ class GUI extends Sprite
 		
 		Explore = new Button(Global.EXPLORE);
 		Explore.x = buttonX;
-		Explore.y = 0 + 10;
+		Explore.y = 0 * 70 + 10;
+		
+		Develop = new Button(Global.DEVELOP);
+		Develop.x = buttonX;
+		Develop.y = 1 * 70 + 10;
 		
 		Settle = new Button(Global.SETTLE);
 		Settle.x = buttonX;
-		Settle.y = 70 + 10;
+		Settle.y = 1 * 70 + 10;
 		
 		Produce = new Button(Global.PRODUCE);
 		Produce.x = buttonX;
-		Produce.y = 140 + 10;
+		Produce.y = 2 * 70 + 10;
+		
+		Upkeep = new Button(Global.UPKEEP);
+		Upkeep.x = buttonX;
+		Upkeep.y = 3 * 70 + 10;
 		
 		Go = new Button(Global.GO);
 		Go.x = buttonX;
@@ -93,18 +101,25 @@ class GUI extends Sprite
 		
 		Pass = new Button(Global.PASS);
 		Pass.x = buttonX;
-		Pass.y = 380;
+		Pass.y = 400;
 		
 		Done = new Button(Global.DONE);
 		Done.x = buttonX;
 		Done.y = 400;
 		
+		Exit = new Button(Global.EXIT);
+		Exit.x = buttonX;
+		Exit.y = 400;
+		
 		addChild(Explore);
+		//addChild(Develop);
 		addChild(Settle);
 		addChild(Produce);
+		addChild(Upkeep);
 		//addChild(Go);
-		//addChild(Pass);
-		addChild(Done);
+		addChild(Pass);
+		//addChild(Done);
+		//addChild(Exit);
 		
 		Red   = Main.MainBitmaps.get(Global.RED);
 		Green = Main.MainBitmaps.get(Global.GREEN);
@@ -123,6 +138,7 @@ class GUI extends Sprite
 		switch (phase)
 		{
 			case Global.EXPLORE: { item.x = Explore.x; item.y = Explore.y; }
+			case Global.DEVELOP: { item.x = Develop.x; item.y = Develop.y; }
 			case Global.SETTLE:  { item.x = Settle.x; item.y = Settle.y; }
 			case Global.PRODUCE: { item.x = Produce.x; item.y = Produce.y; }
 			default:             { item.visible = false; }
@@ -131,16 +147,16 @@ class GUI extends Sprite
 	
 	function update(event : Event)
 	{
-		m_p1Score.text = Std.string(Main.MainRules.Players[0].Points);
-		m_p2Score.text = Std.string(Main.MainRules.Players[1].Points);
-		m_p3Score.text = Std.string(Main.MainRules.Players[2].Points);
+		m_p1Score.text = Std.string(Main.MainRules.Players[0].Energy);
+		m_p2Score.text = Std.string(Main.MainRules.Players[1].Energy);
+		m_p3Score.text = Std.string(Main.MainRules.Players[2].Energy);
 		
 		showItemOnPhase(Phase, Main.MainRules.Phase);
-		showItemOnPhase(Red,   Main.MainRules.Players[0].Phase);
+		showItemOnPhase(Blue,  Main.MainRules.Players[0].Phase);
 		showItemOnPhase(Green, Main.MainRules.Players[1].Phase);
-		showItemOnPhase(Blue,  Main.MainRules.Players[2].Phase);
+		showItemOnPhase(Red,   Main.MainRules.Players[2].Phase);
 		
-		m_status.text = "Energy: " + Std.string(Main.MainRules.Players[0].Energy) + "\n" + "Military: " + Std.string(Main.MainRules.Players[0].Military);
+		m_status.text = "Energy: " + Std.string(Main.MainRules.Players[0].Energy) + "\n" + "Spending: " + Std.string(Main.MainRules.Players[0].Spending);
 	}
 	
 	var m_side : Bitmap;
@@ -162,9 +178,12 @@ class GUI extends Sprite
 	public var Blue : Bitmap;
 	
 	public var Explore : Button;
+	public var Develop : Button;
 	public var Settle  : Button;
 	public var Produce : Button;
+	public var Upkeep  : Button;
 	public var Go      : Button;
 	public var Pass    : Button;
 	public var Done    : Button;
+	public var Exit    : Button;
 }
