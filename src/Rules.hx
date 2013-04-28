@@ -414,6 +414,18 @@ class Rules
 	{
 		if (CurrentPhase.IsValidFor(Players[0], event.currentTarget))
 		{
+			switch (CurrentStep)
+			{
+				case Flow.Explore: Main.MainSounds.Explore.play();
+				case Flow.Settle:  Main.MainSounds.Settle.play();
+				case Flow.Produce: Main.MainSounds.Produce.play();
+				case Flow.Upkeep:
+				{
+					if (Players[0].Spending > 0) Main.MainSounds.Desume.play();
+					else Main.MainSounds.Consume.play();
+				}
+				default:
+			}
 			ExecuteAction(Players[0], event.currentTarget);
 		}
 	}
@@ -559,6 +571,7 @@ class Rules
 		Players[0].Phase = Global.EXPLORE;
 		//Main.MainGui.Done.setActive(true);
 		ProcessedPlayers.set(Players[0], true);
+		Main.MainSounds.Select.play();
 	}
 	
 	function OnSettle(event : Event)
@@ -567,6 +580,7 @@ class Rules
 		Players[0].Phase = Global.SETTLE;
 		//Main.MainGui.Done.setActive(true);
 		ProcessedPlayers.set(Players[0], true);
+		Main.MainSounds.Select.play();
 	}
 	
 	function OnProduce(event : Event)
@@ -575,6 +589,7 @@ class Rules
 		Players[0].Phase = Global.PRODUCE;
 		//Main.MainGui.Done.setActive(true);
 		ProcessedPlayers.set(Players[0], true);
+		Main.MainSounds.Select.play();
 	}
 	
 	function OnPass(event : Event)
@@ -582,6 +597,7 @@ class Rules
 		Main.MainConsole.Log("OnPass");
 		if (CurrentStep == Flow.Upkeep) Players[0].Spending = 0;
 		ProcessedPlayers.set(Players[0], true);
+		Main.MainSounds.Select.play();
 	}
 	
 }

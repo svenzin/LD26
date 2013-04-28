@@ -15,6 +15,7 @@ class Main extends Sprite
 
 	public static var MainConsole : Console;
 	public static var MainBitmaps : BitmapManager;
+	public static var MainSounds : SoundsManager;
 	public static var MainBoard : Board;
 	public static var MainGui : GUI;
 	public static var MainRules : Rules;
@@ -33,6 +34,7 @@ class Main extends Sprite
 		inited = true;
 		
 		MainBitmaps = new BitmapManager();
+		MainSounds = new SoundsManager();
 		
 		MainBoard = new Board();
 		addChild(MainBoard);
