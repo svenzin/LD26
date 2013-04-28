@@ -16,7 +16,12 @@ class Player
 		
 		Phase = Global.NONE;
 	}
-
+	
+	public function hashCode() : String
+	{
+		return Std.string(Id);
+	}
+	
 	public var Id : Int;
 	public var Energy : Int;
 	public var Military : Int;

@@ -95,11 +95,16 @@ class GUI extends Sprite
 		Pass.x = buttonX;
 		Pass.y = 380;
 		
+		Done = new Button(Global.DONE);
+		Done.x = buttonX;
+		Done.y = 400;
+		
 		addChild(Explore);
 		addChild(Settle);
 		addChild(Produce);
-		addChild(Go);
-		addChild(Pass);
+		//addChild(Go);
+		//addChild(Pass);
+		addChild(Done);
 		
 		Red   = Main.MainBitmaps.get(Global.RED);
 		Green = Main.MainBitmaps.get(Global.GREEN);
@@ -161,4 +166,5 @@ class GUI extends Sprite
 	public var Produce : Button;
 	public var Go      : Button;
 	public var Pass    : Button;
+	public var Done    : Button;
 }

@@ -46,11 +46,18 @@ class Main extends Sprite
 		
 		MainRules = new Rules();
 		MainRules.start();
+		
+		addEventListener(Event.ENTER_FRAME, loop);
 		// Stage:
 		// stage.stageWidth x stage.stageHeight @ stage.dpiScale
 		
 		// Assets:
 		// nme.Assets.getBitmapData("img/assetname.jpg");
+	}
+	
+	function loop(event : Event)
+	{
+		MainRules.SingleLoop();
 	}
 
 	/* SETUP */

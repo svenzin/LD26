@@ -12,7 +12,7 @@ class Global
 		
 	}
 
-	public static var Debug : Bool = true;
+	public static var Debug : Bool = false;
 	
 	public static var CellSize : Int = 64;
 	
