@@ -267,9 +267,13 @@ class Rules
 	function HumanDevelop(player : Player) { }
 	function HumanSettle(player : Player) { }
 	function HumanProduce(player : Player) { }
-	function HumanUpkeep(player : Player) { if (player.Spending == 0) ProcessedPlayers.set(player, true); }
+	function HumanUpkeep(player : Player)
+	{
+		player.Phase = Global.NONE;
+		if (player.Spending == 0) ProcessedPlayers.set(player, true);
+	}
 	
-	function AISelect(player : Player)
+	function RandomAISelect(player : Player)
 	{
 		switch (Std.random(3))
 		{
@@ -279,50 +283,53 @@ class Rules
 		}
 		ProcessedPlayers.set(player, true);
 	}
-	function AIExplore(player : Player)
+	function RandomAIExplore(player : Player)
 	{
+		var candidates : Array<Cell> = new Array();
 		for (cell in Main.MainBoard.Cells)
 		{
-			if (CurrentPhase.IsValidFor(player, cell) && !cell.Visible.Check(player))
-			{
-				ExecuteAction(player, cell);
-				break;
-			}
+			if (CurrentPhase.IsValidFor(player, cell) && !cell.Visible.Check(player)) candidates.push(cell);
 		}
+		if (candidates.length > 0) ExecuteAction(player, candidates[Std.random(candidates.length)]);
 		ProcessedPlayers.set(player, true);
 	}
-	function AIDevelop(player : Player)
+	function RandomAISettle(player : Player)
 	{
-		
-	}
-	function AISettle(player : Player)
-	{
+		var candidates : Array<Cell> = new Array();
 		for (cell in Main.MainBoard.Cells)
 		{
-			if (CurrentPhase.IsValidFor(player, cell))
-			{
-				ExecuteAction(player, cell);
-				break;
-			}
+			if (CurrentPhase.IsValidFor(player, cell)) candidates.push(cell);
 		}
+		if (candidates.length > 0) ExecuteAction(player, candidates[Std.random(candidates.length)]);
 		ProcessedPlayers.set(player, true);
 	}
-	function AIProduce(player : Player)
+	function RandomAIProduce(player : Player)
 	{
+		var candidates : Array<Cell> = new Array();
 		for (cell in Main.MainBoard.Cells)
 		{
-			if (CurrentPhase.IsValidFor(player, cell))
-			{
-				ExecuteAction(player, cell);
-				break;
-			}
+			if (CurrentPhase.IsValidFor(player, cell)) candidates.push(cell);
 		}
+		if (candidates.length > 0) ExecuteAction(player, candidates[Std.random(candidates.length)]);
 		ProcessedPlayers.set(player, true);
 	}
-	function AIUpkeep(player : Player)
+	function RandomAIUpkeep(player : Player)
 	{
 		player.Phase = Global.NONE;
 		ProcessedPlayers.set(player, true);
+		
+		if (player.Spending + player.Energy < 0) { player.Energy = -10; return; }
+		
+		while (player.Spending != 0)
+		{
+			var candidates : Array<Cell> = new Array();
+			for (cell in Main.MainBoard.Cells)
+			{
+				if (CurrentPhase.IsValidFor(player, cell)) candidates.push(cell);
+			}
+			if (candidates.length > 0) ExecuteAction(player, candidates[Std.random(candidates.length)]);
+			else player.Spending = 0;
+		}
 	}
 	
 	function ProcessNothing()
@@ -340,8 +347,8 @@ class Rules
 		UpdatePlayers();
 		UpdateCells();
 		
-		AISelect(Players[2]);
-		AISelect(Players[1]);
+		RandomAISelect(Players[2]);
+		RandomAISelect(Players[1]);
 		HumanSelect(Players[0]);
 	}
 	
@@ -350,8 +357,8 @@ class Rules
 		UpdatePlayers();
 		UpdateCells();
 		
-		if (Players[2].Phase == Global.EXPLORE) AIExplore(Players[2]);    else ProcessedPlayers.set(Players[2], true);
-		if (Players[1].Phase == Global.EXPLORE) AIExplore(Players[1]);    else ProcessedPlayers.set(Players[1], true);
+		if (Players[2].Phase == Global.EXPLORE) RandomAIExplore(Players[2]);    else ProcessedPlayers.set(Players[2], true);
+		if (Players[1].Phase == Global.EXPLORE) RandomAIExplore(Players[1]);    else ProcessedPlayers.set(Players[1], true);
 		if (Players[0].Phase == Global.EXPLORE) HumanExplore(Players[0]); else ProcessedPlayers.set(Players[0], true);
 	}
 	
@@ -360,8 +367,8 @@ class Rules
 		UpdatePlayers();
 		UpdateCells();
 		
-		if (Players[2].Phase == Global.SETTLE) AISettle(Players[2]);    else ProcessedPlayers.set(Players[2], true);
-		if (Players[1].Phase == Global.SETTLE) AISettle(Players[1]);    else ProcessedPlayers.set(Players[1], true);
+		if (Players[2].Phase == Global.SETTLE) RandomAISettle(Players[2]);    else ProcessedPlayers.set(Players[2], true);
+		if (Players[1].Phase == Global.SETTLE) RandomAISettle(Players[1]);    else ProcessedPlayers.set(Players[1], true);
 		if (Players[0].Phase == Global.SETTLE) HumanSettle(Players[0]); else ProcessedPlayers.set(Players[0], true);
 	}
 	
@@ -370,8 +377,8 @@ class Rules
 		UpdatePlayers();
 		UpdateCells();
 		
-		if (Players[2].Phase == Global.PRODUCE) AIProduce(Players[2]);    else ProcessedPlayers.set(Players[2], true);
-		if (Players[1].Phase == Global.PRODUCE) AIProduce(Players[1]);    else ProcessedPlayers.set(Players[1], true);
+		if (Players[2].Phase == Global.PRODUCE) RandomAIProduce(Players[2]);    else ProcessedPlayers.set(Players[2], true);
+		if (Players[1].Phase == Global.PRODUCE) RandomAIProduce(Players[1]);    else ProcessedPlayers.set(Players[1], true);
 		if (Players[0].Phase == Global.PRODUCE) HumanProduce(Players[0]); else ProcessedPlayers.set(Players[0], true);
 	}
 	
@@ -380,8 +387,8 @@ class Rules
 		UpdatePlayers();
 		UpdateCells();
 		
-		AIUpkeep(Players[2]);
-		AIUpkeep(Players[1]);
+		RandomAIUpkeep(Players[2]);
+		RandomAIUpkeep(Players[1]);
 		HumanUpkeep(Players[0]);
 	}
 	
@@ -541,7 +548,7 @@ class Rules
 				Main.MainGui.Settle .setActive(false);
 				Main.MainGui.Produce.setActive(false);
 				Main.MainGui.Upkeep .setActive(true);
-				Main.MainGui.Pass   .setActive(false);
+				Main.MainGui.Pass   .setActive(Players[0].Spending > 0);
 			}
 		}
 	}
@@ -573,6 +580,7 @@ class Rules
 	function OnPass(event : Event)
 	{
 		Main.MainConsole.Log("OnPass");
+		if (CurrentStep == Flow.Upkeep) Players[0].Spending = 0;
 		ProcessedPlayers.set(Players[0], true);
 	}
 	

@@ -123,7 +123,7 @@ class Cell extends Sprite
 	}
 	public function Value() : Int
 	{
-		return Sum(Energy) + 3 * Sum(Production) * (Math.floor(Energy / 2.0) + 1);
+		return Sum(Energy) + 4 * Sum(Production) * (Math.floor(Energy / 2.0) + 1);
 	}
 	
 	var m_display : Sprite;

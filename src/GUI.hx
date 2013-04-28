@@ -147,16 +147,16 @@ class GUI extends Sprite
 	
 	function update(event : Event)
 	{
-		m_p1Score.text = Std.string(Main.MainRules.Players[0].Energy);
-		m_p2Score.text = Std.string(Main.MainRules.Players[1].Energy);
-		m_p3Score.text = Std.string(Main.MainRules.Players[2].Energy);
+		m_p1Score.text = Std.string(Main.MainRules.Players[0].Energy + " (" + Main.MainRules.Players[0].Spending + ")");
+		m_p2Score.text = Std.string(Main.MainRules.Players[1].Energy + " (" + Main.MainRules.Players[1].Spending + ")");
+		m_p3Score.text = Std.string(Main.MainRules.Players[2].Energy + " (" + Main.MainRules.Players[2].Spending + ")");
 		
 		showItemOnPhase(Phase, Main.MainRules.Phase);
 		showItemOnPhase(Blue,  Main.MainRules.Players[0].Phase);
 		showItemOnPhase(Green, Main.MainRules.Players[1].Phase);
 		showItemOnPhase(Red,   Main.MainRules.Players[2].Phase);
 		
-		m_status.text = "Energy: " + Std.string(Main.MainRules.Players[0].Energy) + "\n" + "Spending: " + Std.string(Main.MainRules.Players[0].Spending);
+		m_status.text = "";// "Energy: " + Std.string(Main.MainRules.Players[0].Energy) + "\n" + "Spending: " + Std.string(Main.MainRules.Players[0].Spending);
 	}
 	
 	var m_side : Bitmap;

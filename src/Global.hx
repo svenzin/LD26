@@ -24,7 +24,7 @@ class Global
 	public static var MAX_PRODUCTION = 2;
 	
 	public static var DICE_COUNT = 3;
-	public static var DICE_OFFSET = 0.2;
+	public static var DICE_OFFSET = 0.3;
 	public static var MIN_STARTER_VALUE = 0;
 	public static var MAX_STARTER_VALUE = 16;
 	
