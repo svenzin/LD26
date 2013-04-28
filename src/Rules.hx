@@ -85,7 +85,7 @@ class PhaseSettle implements Phase
 		cell.Player = player;
 	}
 	
-	public function Cost() : Int { return 0; }
+	public function Cost() : Int { return 1; }
 }
 
 class PhaseProduce implements Phase
