@@ -1,5 +1,6 @@
 package ;
 
+import library.SpriteManager;
 import nme.display.Bitmap;
 import nme.display.BitmapData;
 import nme.Assets;
@@ -15,62 +16,46 @@ class BitmapManager
 
 	public function new() 
 	{
-		m_data = Assets.getBitmapData("img/Tiles.png");
-		m_tiles = new Hash();
+		m_manager = new SpriteManager(Assets.getBitmapData("img/Tiles.png"), Global.CellSize);
 		
-		register("CELL_P0", MakeRect(0, 0));
-		register("CELL_SELECTED", MakeRect(0, 1));
-		register("CELL_DISABLED", MakeRect(0, 2));
+		m_manager.Register("CELL_P0",       [ 0, 0 ] );
+		m_manager.Register("CELL_SELECTED", [ 1, 0 ] );
+		m_manager.Register("CELL_DISABLED", [ 2, 0 ] );
 		
-		register("CELL_P1", MakeRect(1, 0));
-		register("CELL_P1_SELECTED", MakeRect(1, 1));
+		m_manager.Register("CELL_P1",          [ 0, 1 ] );
+		m_manager.Register("CELL_P1_SELECTED", [ 1, 1 ] );
 		
-		register("CELL_P2", MakeRect(2, 0));
-		register("CELL_P2_SELECTED", MakeRect(2, 1));
+		m_manager.Register("CELL_P2",          [ 0, 2 ] );
+		m_manager.Register("CELL_P2_SELECTED", [ 1, 2 ] );
 		
-		register("CELL_P3", MakeRect(3, 0));
-		register("CELL_P3_SELECTED", MakeRect(3, 1));
+		m_manager.Register("CELL_P3",          [ 0, 3 ] );
+		m_manager.Register("CELL_P3_SELECTED", [ 1, 3 ] );
 		
-		for (i in 0...10) register("MILITARY_" + Std.string(i), MakeRect(4, i));
-		for (i in 0...10) register("ENERGY_" + Std.string(i), MakeRect(5, i));
-		for (i in 0...10) register("PRODUCTION_" + Std.string(i), MakeRect(6, i));
+		for (i in 0...10) m_manager.Register("MILITARY_"   + Std.string(i), [ i, 4 ] );
+		for (i in 0...10) m_manager.Register("ENERGY_"     + Std.string(i), [ i, 5 ] );
+		for (i in 0...10) m_manager.Register("PRODUCTION_" + Std.string(i), [ i, 6 ] );
 
-		register(Global.EXPLORE, MakeRect(7, 0));
-		register(Global.DEVELOP, MakeRect(7, 1));
-		register(Global.SETTLE,  MakeRect(7, 2));
-		register(Global.PRODUCE, MakeRect(7, 3));
-		register(Global.UPKEEP,  MakeRect(7, 4));
+		m_manager.Register(Global.EXPLORE, [ 0, 7 ] );
+		m_manager.Register(Global.DEVELOP, [ 1, 7 ] );
+		m_manager.Register(Global.SETTLE,  [ 2, 7 ] );
+		m_manager.Register(Global.PRODUCE, [ 3, 7 ] );
+		m_manager.Register(Global.UPKEEP,  [ 4, 7 ] );
 		
-		register(Global.GO,   MakeRect(8, 0));
-		register(Global.PASS, MakeRect(8, 1));
-		register(Global.DONE, MakeRect(8, 2));
-		register(Global.EXIT, MakeRect(8, 3));
+		m_manager.Register(Global.GO,   [ 0, 8 ] );
+		m_manager.Register(Global.PASS, [ 1, 8 ] );
+		m_manager.Register(Global.DONE, [ 2, 8 ] );
+		m_manager.Register(Global.EXIT, [ 3, 8 ] );
 		
-		register(Global.PHASE, MakeRect(8, 4));
-		register(Global.BLUE,  MakeRect(8, 5));
-		register(Global.GREEN, MakeRect(8, 6));
-		register(Global.RED,   MakeRect(8, 7));
-	}
-	
-	function MakeRect(line : Int, column : Int) : Rectangle
-	{
-		return new Rectangle(column * Global.CellSize, line * Global.CellSize, Global.CellSize, Global.CellSize);
-	}
-	
-	public function register(name : String, area : Rectangle)
-	{
-		m_tiles.set(name, area);
+		m_manager.Register(Global.PHASE, [ 4, 8 ] );
+		m_manager.Register(Global.BLUE,  [ 5, 8 ] );
+		m_manager.Register(Global.GREEN, [ 6, 8 ] );
+		m_manager.Register(Global.RED,   [ 7, 8 ] );
 	}
 	
 	public function get(name : String) : Bitmap
 	{
-		var area = m_tiles.get(name);
-		var data = new BitmapData(Math.ceil(area.width), Math.ceil(area.height));
-		data.copyPixels(m_data, area, new Point());
-		
-		return new Bitmap(data);
+		return m_manager.Get(name);
 	}
 
-	var m_data : BitmapData;
-	var m_tiles : Hash<Rectangle>;
+	var m_manager : SpriteManager;
 }
