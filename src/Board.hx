@@ -27,7 +27,7 @@ class Board extends Sprite
 		
 		var x = cell.BoardX;
 		var y = cell.BoardY;
-		//Main.MainConsole.Log("x(" + Std.string(cell.x) + ") to " + Std.string(x) + " y(" + Std.string(cell.y) + ") to " + Std.string(y));
+		//LD26.MainConsole.Log("x(" + Std.string(cell.x) + ") to " + Std.string(x) + " y(" + Std.string(cell.y) + ") to " + Std.string(y));
 		
 		if (x > 0)         cells.push(at(x - 1, y));
 		if (x < SizeX - 1) cells.push(at(x + 1, y));

@@ -1,5 +1,6 @@
 package ;
 import flash.display.Sprite;
+import library.Game;
 import nme.display.Bitmap;
 import nme.events.Event;
 import nme.events.MouseEvent;
@@ -15,10 +16,10 @@ class Button extends Sprite
 	{
 		super();
 		
-		m_bitmap = Main.MainBitmaps.get(name);
+		m_bitmap = LD26.MainBitmaps.get(name);
 		addChild(m_bitmap);
 		
-		m_inactive = Main.MainBitmaps.get("CELL_DISABLED");
+		m_inactive = LD26.MainBitmaps.get("CELL_DISABLED");
 		m_inactive.alpha = 0.5;
 		addChild(m_inactive);
 		

@@ -1,4 +1,5 @@
 package ;
+import library.Game;
 import nme.display.Bitmap;
 import nme.display.Sprite;
 import nme.Assets;
@@ -72,16 +73,16 @@ class Cell extends Sprite
 		
 		switch (Player.Id)
 		{
-			case 0: m_display.addChild(Main.MainBitmaps.get("CELL_P0"));
-			case 1: m_display.addChild(Main.MainBitmaps.get("CELL_P1"));
-			case 2: m_display.addChild(Main.MainBitmaps.get("CELL_P2"));
-			case 3: m_display.addChild(Main.MainBitmaps.get("CELL_P3"));
+			case 0: m_display.addChild(LD26.MainBitmaps.get("CELL_P0"));
+			case 1: m_display.addChild(LD26.MainBitmaps.get("CELL_P1"));
+			case 2: m_display.addChild(LD26.MainBitmaps.get("CELL_P2"));
+			case 3: m_display.addChild(LD26.MainBitmaps.get("CELL_P3"));
 		}
 		
-		if (Selected) m_display.addChild(Main.MainBitmaps.get("CELL_SELECTED"));
+		if (Selected) m_display.addChild(LD26.MainBitmaps.get("CELL_SELECTED"));
 		if (!Active)
 		{
-			var bitmap = Main.MainBitmaps.get("CELL_DISABLED");
+			var bitmap = LD26.MainBitmaps.get("CELL_DISABLED");
 			bitmap.alpha = 0.25;
 			m_display.addChild(bitmap);
 		}
@@ -89,8 +90,8 @@ class Cell extends Sprite
 		if (Visible.Check(player))
 		//if (!Visible.Empty())
 		{
-			m_display.addChild(Main.MainBitmaps.get("ENERGY_" + Std.string(Energy)));
-			m_display.addChild(Main.MainBitmaps.get("PRODUCTION_" + Std.string(Production)));
+			m_display.addChild(LD26.MainBitmaps.get("ENERGY_" + Std.string(Energy)));
+			m_display.addChild(LD26.MainBitmaps.get("PRODUCTION_" + Std.string(Production)));
 		}
 	}
 	

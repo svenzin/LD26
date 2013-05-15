@@ -1,4 +1,5 @@
 package ;
+import library.Game;
 import nme.display.Bitmap;
 import nme.Assets;
 import nme.display.Sprite;
@@ -70,7 +71,7 @@ class GUI extends Sprite
 		addChild(m_p3Score);
 		addChild(m_status);
 		
-		Phase = Main.MainBitmaps.get(Global.PHASE);
+		Phase = LD26.MainBitmaps.get(Global.PHASE);
 		addChild(Phase);
 		
 		var buttonX = m_side.x - 70;
@@ -121,9 +122,9 @@ class GUI extends Sprite
 		//addChild(Done);
 		//addChild(Exit);
 		
-		Red   = Main.MainBitmaps.get(Global.RED);
-		Green = Main.MainBitmaps.get(Global.GREEN);
-		Blue  = Main.MainBitmaps.get(Global.BLUE);
+		Red   = LD26.MainBitmaps.get(Global.RED);
+		Green = LD26.MainBitmaps.get(Global.GREEN);
+		Blue  = LD26.MainBitmaps.get(Global.BLUE);
 		
 		addChild(Red);
 		addChild(Green);
@@ -147,16 +148,16 @@ class GUI extends Sprite
 	
 	function update(event : Event)
 	{
-		m_p1Score.text = Std.string(Main.MainRules.Players[0].Energy + " (" + Main.MainRules.Players[0].Spending + ")");
-		m_p2Score.text = Std.string(Main.MainRules.Players[1].Energy + " (" + Main.MainRules.Players[1].Spending + ")");
-		m_p3Score.text = Std.string(Main.MainRules.Players[2].Energy + " (" + Main.MainRules.Players[2].Spending + ")");
+		m_p1Score.text = Std.string(LD26.MainRules.Players[0].Energy + " (" + LD26.MainRules.Players[0].Spending + ")");
+		m_p2Score.text = Std.string(LD26.MainRules.Players[1].Energy + " (" + LD26.MainRules.Players[1].Spending + ")");
+		m_p3Score.text = Std.string(LD26.MainRules.Players[2].Energy + " (" + LD26.MainRules.Players[2].Spending + ")");
 		
-		showItemOnPhase(Phase, Main.MainRules.Phase);
-		showItemOnPhase(Blue,  Main.MainRules.Players[0].Phase);
-		showItemOnPhase(Green, Main.MainRules.Players[1].Phase);
-		showItemOnPhase(Red,   Main.MainRules.Players[2].Phase);
+		showItemOnPhase(Phase, LD26.MainRules.Phase);
+		showItemOnPhase(Blue,  LD26.MainRules.Players[0].Phase);
+		showItemOnPhase(Green, LD26.MainRules.Players[1].Phase);
+		showItemOnPhase(Red,   LD26.MainRules.Players[2].Phase);
 		
-		m_status.text = "";// "Energy: " + Std.string(Main.MainRules.Players[0].Energy) + "\n" + "Spending: " + Std.string(Main.MainRules.Players[0].Spending);
+		m_status.text = "";// "Energy: " + Std.string(LD26.MainRules.Players[0].Energy) + "\n" + "Spending: " + Std.string(LD26.MainRules.Players[0].Spending);
 	}
 	
 	var m_side : Bitmap;

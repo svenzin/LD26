@@ -1,4 +1,5 @@
 package ;
+import library.Game;
 import nme.events.Event;
 import nme.events.MouseEvent;
 import nme.ObjectHash;
@@ -18,9 +19,9 @@ interface Phase
 class PhaseNone implements Phase
 {
 	public function new() {}
-	public function Go(player : Player) { Main.MainConsole.Log("GoNone"); }
+	public function Go(player : Player) { LD26.MainConsole.Log("GoNone"); }
 	public function IsValidFor(player : Player, cell : Cell) : Bool { return false; }
-	public function ActionFor(player : Player, cell : Cell) { Main.MainConsole.Log("ActionForNone"); }
+	public function ActionFor(player : Player, cell : Cell) { LD26.MainConsole.Log("ActionForNone"); }
 	public function Cost() : Int { return 0; }
 }
 
@@ -30,14 +31,14 @@ class PhaseExplore implements Phase
 
 	public function Go(player : Player)
 	{
-		Main.MainConsole.Log("GoExplore");
+		LD26.MainConsole.Log("GoExplore");
 	}
 	
 	public function IsValidFor(player : Player, cell : Cell) : Bool
 	{
 		if (cell.Player == player) return false;
 		
-		for (other in Main.MainBoard.neighbours(cell))
+		for (other in LD26.MainBoard.neighbours(cell))
 		{
 			if (other.Player == player) return true;
 		}
@@ -47,9 +48,9 @@ class PhaseExplore implements Phase
 	
 	public function ActionFor(player : Player, cell : Cell)
 	{
-		Main.MainConsole.Log("ActionForExplore");
+		LD26.MainConsole.Log("ActionForExplore");
 		cell.Visible.Add(player);
-		for (other in Main.MainBoard.neighbours(cell))
+		for (other in LD26.MainBoard.neighbours(cell))
 		{
 			other.Visible.Add(player);
 		}
@@ -62,7 +63,7 @@ class PhaseSettle implements Phase
 {
 	public function new() {}
 
-	public function Go(player : Player) { Main.MainConsole.Log("GoSettle"); }
+	public function Go(player : Player) { LD26.MainConsole.Log("GoSettle"); }
 	
 	public function IsValidFor(player : Player, cell : Cell) : Bool
 	{
@@ -70,7 +71,7 @@ class PhaseSettle implements Phase
 		if (cell.Energy + cell.Production > player.Energy) return false;
 		if (!cell.Visible.Check(player)) return false;
 		
-		for (other in Main.MainBoard.neighbours(cell))
+		for (other in LD26.MainBoard.neighbours(cell))
 		{
 			if (other.Player == player) return true;
 		}
@@ -80,7 +81,7 @@ class PhaseSettle implements Phase
 	
 	public function ActionFor(player : Player, cell : Cell)
 	{
-		Main.MainConsole.Log("ActionForSettle");
+		LD26.MainConsole.Log("ActionForSettle");
 		player.Spending -= cell.Energy;
 		cell.Player = player;
 	}
@@ -92,7 +93,7 @@ class PhaseProduce implements Phase
 {
 	public function new() {}
 
-	public function Go(player : Player) { Main.MainConsole.Log("GoProduce"); }
+	public function Go(player : Player) { LD26.MainConsole.Log("GoProduce"); }
 	
 	public function IsValidFor(player : Player, cell : Cell) : Bool
 	{
@@ -101,7 +102,7 @@ class PhaseProduce implements Phase
 	
 	public function ActionFor(player : Player, cell : Cell)
 	{
-		Main.MainConsole.Log("ActionForProduce");
+		LD26.MainConsole.Log("ActionForProduce");
 		player.Spending += cell.Production;
 	}
 	
@@ -112,7 +113,7 @@ class PhaseUpkeep implements Phase
 {
 	public function new() {}
 
-	public function Go(player : Player) { Main.MainConsole.Log("GoUpkeep"); }
+	public function Go(player : Player) { LD26.MainConsole.Log("GoUpkeep"); }
 	
 	public function IsValidFor(player : Player, cell : Cell) : Bool
 	{
@@ -126,7 +127,7 @@ class PhaseUpkeep implements Phase
 	
 	public function ActionFor(player : Player, cell : Cell)
 	{
-		Main.MainConsole.Log("ActionForProduce");
+		LD26.MainConsole.Log("ActionForProduce");
 		if (player.Spending > 0)
 		{
 			cell.Energy += 1;
@@ -169,17 +170,17 @@ class Rules
 		
 		ProcessedPlayers = new ObjectHash();
 		
-		Main.MainGui.Explore.addEventListener(Global.EXPLORE, OnExplore);
-		Main.MainGui.Settle .addEventListener(Global.SETTLE,  OnSettle);
-		Main.MainGui.Produce.addEventListener(Global.PRODUCE, OnProduce);
-		Main.MainGui.Pass   .addEventListener(Global.PASS,    OnPass);
+		LD26.MainGui.Explore.addEventListener(Global.EXPLORE, OnExplore);
+		LD26.MainGui.Settle .addEventListener(Global.SETTLE,  OnSettle);
+		LD26.MainGui.Produce.addEventListener(Global.PRODUCE, OnProduce);
+		LD26.MainGui.Pass   .addEventListener(Global.PASS,    OnPass);
 	}
 
 	public function start()
 	{
 		var start : Cell;
 		
-		start = Main.MainBoard.at(Std.random(Main.MainBoard.SizeX), Std.random(Main.MainBoard.SizeY));
+		start = LD26.MainBoard.at(Std.random(LD26.MainBoard.SizeX), Std.random(LD26.MainBoard.SizeY));
 		start.Player = Players[0];
 		start.Energy = 2;
 		start.Production = 2;
@@ -187,7 +188,7 @@ class Rules
 		
 		while (start.Player == Players[0])
 		{
-			start = Main.MainBoard.at(Std.random(Main.MainBoard.SizeX), Std.random(Main.MainBoard.SizeY));
+			start = LD26.MainBoard.at(Std.random(LD26.MainBoard.SizeX), Std.random(LD26.MainBoard.SizeY));
 		}
 		start.Player = Players[1];
 		start.Energy = 2;
@@ -196,14 +197,14 @@ class Rules
 		
 		while (start.Player == Players[0] || start.Player == Players[1])
 		{
-			start = Main.MainBoard.at(Std.random(Main.MainBoard.SizeX), Std.random(Main.MainBoard.SizeY));
+			start = LD26.MainBoard.at(Std.random(LD26.MainBoard.SizeX), Std.random(LD26.MainBoard.SizeY));
 		}
 		start.Player = Players[2];
 		start.Energy = 2;
 		start.Production = 2;
 		start.Visible.Add(Players[2]);
 
-		for (cell in Main.MainBoard.Cells)
+		for (cell in LD26.MainBoard.Cells)
 		{
 			cell.addEventListener(MouseEvent.CLICK, OnCellClicked);
 		}
@@ -221,7 +222,7 @@ class Rules
 	{
 		if (FinishedProcessingPlayers())
 		{
-			//Main.MainConsole.Log("Moving to next step");
+			//LD26.MainConsole.Log("Moving to next step");
 			NextStep();
 			
 			UpdateProcess();
@@ -236,7 +237,7 @@ class Rules
 	
 	function PostProcess()
 	{
-		for (cell in Main.MainBoard.Cells)
+		for (cell in LD26.MainBoard.Cells)
 		{
 			if (cell.Energy > Global.MAX_STABLE_ENERGY) cell.Energy -= 1;
 		}
@@ -286,7 +287,7 @@ class Rules
 	function RandomAIExplore(player : Player)
 	{
 		var candidates : Array<Cell> = new Array();
-		for (cell in Main.MainBoard.Cells)
+		for (cell in LD26.MainBoard.Cells)
 		{
 			if (CurrentPhase.IsValidFor(player, cell) && !cell.Visible.Check(player)) candidates.push(cell);
 		}
@@ -296,7 +297,7 @@ class Rules
 	function RandomAISettle(player : Player)
 	{
 		var candidates : Array<Cell> = new Array();
-		for (cell in Main.MainBoard.Cells)
+		for (cell in LD26.MainBoard.Cells)
 		{
 			if (CurrentPhase.IsValidFor(player, cell)) candidates.push(cell);
 		}
@@ -306,7 +307,7 @@ class Rules
 	function RandomAIProduce(player : Player)
 	{
 		var candidates : Array<Cell> = new Array();
-		for (cell in Main.MainBoard.Cells)
+		for (cell in LD26.MainBoard.Cells)
 		{
 			if (CurrentPhase.IsValidFor(player, cell)) candidates.push(cell);
 		}
@@ -323,7 +324,7 @@ class Rules
 		while (player.Spending != 0)
 		{
 			var candidates : Array<Cell> = new Array();
-			for (cell in Main.MainBoard.Cells)
+			for (cell in LD26.MainBoard.Cells)
 			{
 				if (CurrentPhase.IsValidFor(player, cell)) candidates.push(cell);
 			}
@@ -416,13 +417,13 @@ class Rules
 		{
 			switch (CurrentStep)
 			{
-				case Flow.Explore: Main.MainSounds.Explore.play();
-				case Flow.Settle:  Main.MainSounds.Settle.play();
-				case Flow.Produce: Main.MainSounds.Produce.play();
+				case Flow.Explore: LD26.MainSounds.Explore.play();
+				case Flow.Settle:  LD26.MainSounds.Settle.play();
+				case Flow.Produce: LD26.MainSounds.Produce.play();
 				case Flow.Upkeep:
 				{
-					if (Players[0].Spending > 0) Main.MainSounds.Desume.play();
-					else Main.MainSounds.Consume.play();
+					if (Players[0].Spending > 0) LD26.MainSounds.Desume.play();
+					else LD26.MainSounds.Consume.play();
 				}
 				default:
 			}
@@ -432,7 +433,7 @@ class Rules
 	
 	function UpdateCells()
 	{
-		for (cell in Main.MainBoard.Cells)
+		for (cell in LD26.MainBoard.Cells)
 		{
 			cell.Active = CurrentPhase.IsValidFor(Players[0], cell);
 			cell.Update(Players[0]);
@@ -445,7 +446,7 @@ class Rules
 		{
 			player.Energy = 0;
 			player.Production = 0;
-			for (cell in Main.MainBoard.Cells)
+			for (cell in LD26.MainBoard.Cells)
 			{
 				if (cell.Player == player)
 				{
@@ -511,93 +512,93 @@ class Rules
 		{
 			case Flow.Init:
 			{
-				Main.MainGui.Explore.setActive(false);
-				Main.MainGui.Settle .setActive(false);
-				Main.MainGui.Produce.setActive(false);
-				Main.MainGui.Upkeep .setActive(false);
-				Main.MainGui.Pass   .setActive(false);
+				LD26.MainGui.Explore.setActive(false);
+				LD26.MainGui.Settle .setActive(false);
+				LD26.MainGui.Produce.setActive(false);
+				LD26.MainGui.Upkeep .setActive(false);
+				LD26.MainGui.Pass   .setActive(false);
 			}
 			
 			case Flow.Select:
 			{
-				Main.MainGui.Explore.setActive(Players[0].Energy >= new PhaseExplore().Cost());
-				Main.MainGui.Settle .setActive(Players[0].Energy >= new PhaseSettle().Cost());
-				Main.MainGui.Produce.setActive(Players[0].Energy >= new PhaseProduce().Cost());
-				Main.MainGui.Upkeep.setActive(false);
-				Main.MainGui.Pass  .setActive(false);
+				LD26.MainGui.Explore.setActive(Players[0].Energy >= new PhaseExplore().Cost());
+				LD26.MainGui.Settle .setActive(Players[0].Energy >= new PhaseSettle().Cost());
+				LD26.MainGui.Produce.setActive(Players[0].Energy >= new PhaseProduce().Cost());
+				LD26.MainGui.Upkeep.setActive(false);
+				LD26.MainGui.Pass  .setActive(false);
 			}
 			
 			case Flow.Explore:
 			{
-				Main.MainGui.Explore.setActive(false);
-				Main.MainGui.Settle .setActive(false);
-				Main.MainGui.Produce.setActive(false);
-				Main.MainGui.Upkeep .setActive(false);
-				Main.MainGui.Pass   .setActive(true);
+				LD26.MainGui.Explore.setActive(false);
+				LD26.MainGui.Settle .setActive(false);
+				LD26.MainGui.Produce.setActive(false);
+				LD26.MainGui.Upkeep .setActive(false);
+				LD26.MainGui.Pass   .setActive(true);
 			}
 			
 			case Flow.Settle:
 			{
-				Main.MainGui.Explore.setActive(false);
-				Main.MainGui.Settle .setActive(false);
-				Main.MainGui.Produce.setActive(false);
-				Main.MainGui.Upkeep .setActive(false);
-				Main.MainGui.Pass   .setActive(true);
+				LD26.MainGui.Explore.setActive(false);
+				LD26.MainGui.Settle .setActive(false);
+				LD26.MainGui.Produce.setActive(false);
+				LD26.MainGui.Upkeep .setActive(false);
+				LD26.MainGui.Pass   .setActive(true);
 			}
 			
 			case Flow.Produce:
 			{
-				Main.MainGui.Explore.setActive(false);
-				Main.MainGui.Settle .setActive(false);
-				Main.MainGui.Produce.setActive(false);
-				Main.MainGui.Upkeep .setActive(false);
-				Main.MainGui.Pass   .setActive(true);
+				LD26.MainGui.Explore.setActive(false);
+				LD26.MainGui.Settle .setActive(false);
+				LD26.MainGui.Produce.setActive(false);
+				LD26.MainGui.Upkeep .setActive(false);
+				LD26.MainGui.Pass   .setActive(true);
 			}
 			
 			case Flow.Upkeep:
 			{
-				Main.MainGui.Explore.setActive(false);
-				Main.MainGui.Settle .setActive(false);
-				Main.MainGui.Produce.setActive(false);
-				Main.MainGui.Upkeep .setActive(true);
-				Main.MainGui.Pass   .setActive(Players[0].Spending > 0);
+				LD26.MainGui.Explore.setActive(false);
+				LD26.MainGui.Settle .setActive(false);
+				LD26.MainGui.Produce.setActive(false);
+				LD26.MainGui.Upkeep .setActive(true);
+				LD26.MainGui.Pass   .setActive(Players[0].Spending > 0);
 			}
 		}
 	}
 	
 	function OnExplore(event : Event)
 	{
-		Main.MainConsole.Log("OnExplore");
+		LD26.MainConsole.Log("OnExplore");
 		Players[0].Phase = Global.EXPLORE;
-		//Main.MainGui.Done.setActive(true);
+		//LD26.MainGui.Done.setActive(true);
 		ProcessedPlayers.set(Players[0], true);
-		Main.MainSounds.Select.play();
+		LD26.MainSounds.Select.play();
 	}
 	
 	function OnSettle(event : Event)
 	{
-		Main.MainConsole.Log("OnSettle");
+		LD26.MainConsole.Log("OnSettle");
 		Players[0].Phase = Global.SETTLE;
-		//Main.MainGui.Done.setActive(true);
+		//LD26.MainGui.Done.setActive(true);
 		ProcessedPlayers.set(Players[0], true);
-		Main.MainSounds.Select.play();
+		LD26.MainSounds.Select.play();
 	}
 	
 	function OnProduce(event : Event)
 	{
-		Main.MainConsole.Log("OnProduce");
+		LD26.MainConsole.Log("OnProduce");
 		Players[0].Phase = Global.PRODUCE;
-		//Main.MainGui.Done.setActive(true);
+		//LD26.MainGui.Done.setActive(true);
 		ProcessedPlayers.set(Players[0], true);
-		Main.MainSounds.Select.play();
+		LD26.MainSounds.Select.play();
 	}
 	
 	function OnPass(event : Event)
 	{
-		Main.MainConsole.Log("OnPass");
+		LD26.MainConsole.Log("OnPass");
 		if (CurrentStep == Flow.Upkeep) Players[0].Spending = 0;
 		ProcessedPlayers.set(Players[0], true);
-		Main.MainSounds.Select.play();
+		LD26.MainSounds.Select.play();
 	}
 	
 }
