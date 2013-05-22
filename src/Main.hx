@@ -17,13 +17,15 @@ import nme.Lib;
 
 class Main extends Sprite 
 {
+	// Entry point
 	private function init() 
 	{
-		addChild(new LD26());
+		var game = new Game();
+		addChild(game);
+		game.NextWorld(new LD26());
 	}
 	
-	/* SETUP */
-
+	// Boilerplate
 	public static function main() 
 	{
 		Lib.current.addChild(new Main());

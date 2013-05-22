@@ -5,13 +5,14 @@ import library.Game;
 import library.SpriteManager;
 import nme.Assets;
 import nme.events.Event;
+import nme.utils.Timer;
 
 /**
  * ...
  * @author scorder
  */
 
-class LD26 extends Game
+class LD26 extends World
 {
 	public static var MainConsole : Console;
 	public static var MainBitmaps : BitmapManager;
@@ -23,12 +24,12 @@ class LD26 extends Game
 	public function new()
 	{
 		super();
-		init();
+		Initialize();
 	}
 	
 	var font : SpriteManager;
 	var letters : Animation;
-	private override function init() 
+	private function Initialize() 
 	{
 		MainBitmaps = new BitmapManager();
 		MainSounds = new SoundsManager();
@@ -55,22 +56,28 @@ class LD26 extends Game
 		letters.scaleX = 8;
 		letters.scaleY = 8;
 		addChild(letters);
-		 //(your code here)
 		
-		addEventListener(Event.ENTER_FRAME, loop);
+		addEventListener(Event.ENTER_FRAME, Update);
+		 //(your code here)
 		
 		 //Stage:
 		 //stage.stageWidth x stage.stageHeight @ stage.dpiScale
 		
 		 //Assets:
 		 //nme.Assets.getBitmapData("img/assetname.jpg");
+		 
+		 letters.PlayOverTime(2000, 4);
+		 haxe.Timer.delay(function () { letters.Stop(); }, 1190);
 	}
 	var newFrame : Int = 0;
-	function loop(event : Event)
+	function Update(event : Event)
 	{
+		//super.Update(event);
+		
 		newFrame = (newFrame + 1) % (4 * letters.Length);
-		letters.SetFrame(newFrame >> 2);
-		MainRules.SingleLoop();
+		//letters.SetFrame(newFrame >> 2);
+		//MainRules.SingleLoop();
+		//MainRules.SingleLoop();
 	}
 
 	//public static var Instance(default, null) : Game = null;

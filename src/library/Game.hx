@@ -1,12 +1,13 @@
 package library;
+import com.eclecticdesignstudio.motion.Actuate;
 import nme.display.Sprite;
+import nme.events.Event;
 
 /**
  * ...
  * @author scorder
  */
 
-//
 //class Global extends EventDispatcher
 //{
 	//public var Ticks(default, null) : Int;
@@ -33,17 +34,51 @@ import nme.display.Sprite;
 	//}
 //}
 
+class World extends Sprite { }
 class Game extends Sprite
 {
 	public function new()
 	{
 		super();
-		init();
+		Construct();
+		addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 	}
 	
-	private function init() 
+	private function Construct()
 	{
-
+		CurrentWorld = null;
+		m_nextWorld = null;
+	}
+	
+	private function onAddedToStage(e : Event)
+	{
+		removeEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
+		
+		addEventListener(Event.ENTER_FRAME, Update);
+		Initialize();
+	}
+	
+	private function Update(e : Event)
+	{
+		ChangeWorld();
+	}
+	
+	private function Initialize() { }
+	
+	public  var CurrentWorld(default, null) : World;
+	private var m_nextWorld : World;
+	public function NextWorld(nextWorld : World)
+	{
+		m_nextWorld = nextWorld;
+	}
+	private function ChangeWorld()
+	{
+		if (m_nextWorld == null) return;
+		
+		if (CurrentWorld != null) removeChild(CurrentWorld);
+		CurrentWorld = m_nextWorld;
+		m_nextWorld = null;
+		addChild(CurrentWorld);
 	}
 	
 
